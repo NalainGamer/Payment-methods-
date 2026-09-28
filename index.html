@@ -1,37 +1,87 @@
-const express = require('express');
-const axios = require('axios');
-const app = express();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Deals PK - Payment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .payment-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 350px;
+            width: 100%;
+            text-align: center;
+        }
+        h2 { margin-bottom: 10px; color: #333; }
+        .amount { font-size: 24px; font-weight: bold; color: #28a745; margin-bottom: 20px; }
+        .info-box { background: #eef2f5; padding: 12px; border-radius: 6px; font-size: 14px; margin-bottom: 20px; text-align: left; }
+        label { display: block; text-align: left; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
 
-app.use(express.json());
+<div class="payment-card">
+    <h2>Smart Deals PK</h2>
+    <p>Complete your payment below</p>
+    <div class="amount">Rs. 500</div>
 
-// Endpoint to trigger payment checkout
-app.post('/api/checkout', async (req, res) => {
-    const { customerPhone } = req.body;
-    const amount = "500.00";
+    <div class="info-box">
+        <strong>Send Payment To:</strong><br>
+        EasyPaisa / JazzCash: <strong>03711965637</strong>
+    </div>
 
-    // Request payload structure provided by official Merchant API documentation
-    const payload = {
-        merchantId: process.env.MERCHANT_ID,
-        storeId: process.env.STORE_ID,
-        transactionAmount: amount,
-        customerMobileNumber: customerPhone,
-        transactionType: "MWALLET",
-        // Additional parameters and HMAC security signatures required by gateway
-    };
+    <form id="paymentForm">
+        <label for="method">Select Payment Method</label>
+        <select id="method" required>
+            <option value="Easypaisa">EasyPaisa</option>
+            <option value="JazzCash">JazzCash</option>
+        </select>
 
-    try {
-        // Send request to Official Gateway URL
-        const gatewayResponse = await axios.post('https://sandbox.paymentgateway.com/api/v1/charge', payload, {
-            headers: {
-                'Authorization': `Bearer ${process.env.API_TOKEN}`,
-                'Content-Type': 'application/json'
-            }
-        });
+        <label for="phone">Your Mobile Number</label>
+        <input type="tel" id="phone" placeholder="03XXXXXXXXX" required pattern="[0-9]{11}">
 
-        res.status(200).json({ success: true, status: gatewayResponse.data.status });
-    } catch (error) {
-        res.status(500).json({ success: false, message: "Payment request failed to initialize." });
-    }
-});
+        <label for="trxid">Transaction ID (TrxID)</label>
+        <input type="text" id="trxid" placeholder="Enter 11-digit TrxID" required>
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+        <button type="submit">Confirm Payment</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Thank you! Your payment details have been submitted for verification.');
+    });
+</script>
+
+</body>
+    </html>
+            
