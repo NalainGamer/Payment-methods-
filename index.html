@@ -11,21 +11,24 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
         }
         .payment-card {
             background: white;
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            max-width: 350px;
+            max-width: 380px;
             width: 100%;
             text-align: center;
         }
         h2 { margin-bottom: 10px; color: #333; }
-        .amount { font-size: 24px; font-weight: bold; color: #28a745; margin-bottom: 20px; }
-        .info-box { background: #eef2f5; padding: 12px; border-radius: 6px; font-size: 14px; margin-bottom: 20px; text-align: left; }
+        .amount { font-size: 24px; font-weight: bold; color: #28a745; margin-bottom: 15px; }
+        .qr-container { margin-bottom: 15px; }
+        .qr-container img { width: 180px; height: 180px; border-radius: 8px; border: 1px solid #ddd; padding: 5px; }
+        .info-box { background: #eef2f5; padding: 12px; border-radius: 6px; font-size: 13px; margin-bottom: 20px; text-align: left; line-height: 1.5; }
         label { display: block; text-align: left; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
         input, select, button {
             width: 100%;
@@ -37,13 +40,15 @@
             font-size: 15px;
         }
         button {
-            background-color: #007bff;
+            background-color: #25D366;
             color: white;
             border: none;
             font-weight: bold;
             cursor: pointer;
+            font-size: 16px;
         }
-        button:hover { background-color: #0056b3; }
+        button:hover { background-color: #128C7E; }
+        .error { color: red; font-size: 12px; text-align: left; margin-top: -10px; margin-bottom: 10px; display: none; }
     </style>
 </head>
 <body>
@@ -53,35 +58,99 @@
     <p>Complete your payment below</p>
     <div class="amount">Rs. 500</div>
 
+    <div class="qr-container">
+        <img id="qrImage" src="https://ibb.co/ZpVnSnN2" alt="Payment QR Code">
+    </div>
+
     <div class="info-box">
-        <strong>Send Payment To:</strong><br>
-        EasyPaisa / JazzCash: <strong>03711965637</strong>
+        <strong>Payment Instructions:</strong><br>
+        1. Scan the QR code above or send <strong>Rs. 500</strong> manually to: <strong>03711965637</strong>.<br>
+        2. Enter your phone number & 11-digit TrxID below.<br>
+        3. Attach your payment screenshot and submit to verify on WhatsApp.
     </div>
 
     <form id="paymentForm">
         <label for="method">Select Payment Method</label>
-        <select id="method" required>
-            <option value="Easypaisa">EasyPaisa</option>
+        <select id="method" onchange="updateQR()" required>
+            <option value="EasyPaisa">EasyPaisa</option>
             <option value="JazzCash">JazzCash</option>
         </select>
 
         <label for="phone">Your Mobile Number</label>
-        <input type="tel" id="phone" placeholder="03XXXXXXXXX" required pattern="[0-9]{11}">
+        <input type="tel" id="phone" placeholder="03XXXXXXXXX" required pattern="03[0-9]{9}" maxlength="11">
+        <div id="phoneError" class="error">Please enter a valid 11-digit Pakistani phone number starting with 03.</div>
 
         <label for="trxid">Transaction ID (TrxID)</label>
-        <input type="text" id="trxid" placeholder="Enter 11-digit TrxID" required>
+        <input type="text" id="trxid" placeholder="Enter 11-digit TrxID" required pattern="[0-9]{11}" maxlength="11">
+        <div id="trxError" class="error">Invalid TrxID. Must be exactly 11 numeric digits (no letters allowed).</div>
 
-        <button type="submit">Confirm Payment</button>
+        <label for="screenshot">Upload Payment Screenshot</label>
+        <input type="file" id="screenshot" accept="image/*" required>
+        <div id="fileError" class="error">Please attach a payment screenshot.</div>
+
+        <button type="submit">Send Payment Proof on WhatsApp</button>
     </form>
 </div>
 
 <script>
+    function updateQR() {
+        const method = document.getElementById('method').value;
+        const qrImage = document.getElementById('qrImage');
+        if (method === 'EasyPaisa') {
+            qrImage.src = 'https://ibb.co/ZpVnSnN2';
+        } else {
+            qrImage.src = 'https://ibb.co/kvm6sLF';
+        }
+    }
+
     document.getElementById('paymentForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        alert('Thank you! Your payment details have been submitted for verification.');
+        
+        const phone = document.getElementById('phone').value.trim();
+        const trxid = document.getElementById('trxid').value.trim();
+        const screenshot = document.getElementById('screenshot').files[0];
+        const method = document.getElementById('method').value;
+
+        const phoneError = document.getElementById('phoneError');
+        const trxError = document.getElementById('trxError');
+        const fileError = document.getElementById('fileError');
+
+        let isValid = true;
+
+        // Validate Phone
+        if (!/^03[0-9]{9}$/.test(phone)) {
+            phoneError.style.display = 'block';
+            isValid = false;
+        } else {
+            phoneError.style.display = 'none';
+        }
+
+        // Validate TrxID (Must be strictly 11 digits)
+        if (!/^[0-9]{11}$/.test(trxid)) {
+            trxError.style.display = 'block';
+            isValid = false;
+        } else {
+            trxError.style.display = 'none';
+        }
+
+        // Validate File Attachment
+        if (!screenshot) {
+            fileError.style.display = 'block';
+            isValid = false;
+        } else {
+            fileError.style.display = 'none';
+        }
+
+        // Redirect to WhatsApp only if ALL inputs are strictly valid
+        if (isValid) {
+            let message = `Hello Smart Deals PK,%0A%0AI have sent Rs. 500 payment.%0A%0A*Method:* ${method}%0A*My Phone:* ${phone}%0A*TrxID:* ${trxid}%0A%0A_I am attaching my payment screenshot below:_`;
+            let whatsappUrl = `https://wa.me/923711965637?text=${message}`;
+            
+            window.open(whatsappUrl, '_blank');
+        }
     });
 </script>
 
 </body>
-    </html>
-            
+        </html>
+        
