@@ -27,7 +27,7 @@
         h2 { margin-bottom: 10px; color: #333; }
         .amount { font-size: 24px; font-weight: bold; color: #28a745; margin-bottom: 15px; }
         .qr-container { margin-bottom: 15px; }
-        .qr-container img { width: 180px; height: 180px; border-radius: 8px; border: 1px solid #ddd; padding: 5px; }
+        .qr-container img { width: 200px; height: auto; border-radius: 8px; border: 1px solid #ddd; padding: 5px; }
         .info-box { background: #eef2f5; padding: 12px; border-radius: 6px; font-size: 13px; margin-bottom: 20px; text-align: left; line-height: 1.5; }
         label { display: block; text-align: left; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
         input, select, button {
@@ -59,7 +59,7 @@
     <div class="amount">Rs. 500</div>
 
     <div class="qr-container">
-        <img id="qrImage" src="https://ibb.co/ZpVnSnN2" alt="Payment QR Code">
+        <img id="qrImage" src="https://i.ibb.co/ZpVnSnN2/easypaisa.jpg" alt="Payment QR Code">
     </div>
 
     <div class="info-box">
@@ -97,9 +97,9 @@
         const method = document.getElementById('method').value;
         const qrImage = document.getElementById('qrImage');
         if (method === 'EasyPaisa') {
-            qrImage.src = 'https://ibb.co/ZpVnSnN2';
+            qrImage.src = 'https://i.ibb.co/ZpVnSnN2/easypaisa.jpg';
         } else {
-            qrImage.src = 'https://ibb.co/kvm6sLF';
+            qrImage.src = 'https://i.ibb.co/kvm6sLF/jazzcash.jpg';
         }
     }
 
@@ -117,7 +117,6 @@
 
         let isValid = true;
 
-        // Validate Phone
         if (!/^03[0-9]{9}$/.test(phone)) {
             phoneError.style.display = 'block';
             isValid = false;
@@ -125,7 +124,6 @@
             phoneError.style.display = 'none';
         }
 
-        // Validate TrxID (Must be strictly 11 digits)
         if (!/^[0-9]{11}$/.test(trxid)) {
             trxError.style.display = 'block';
             isValid = false;
@@ -133,7 +131,6 @@
             trxError.style.display = 'none';
         }
 
-        // Validate File Attachment
         if (!screenshot) {
             fileError.style.display = 'block';
             isValid = false;
@@ -141,7 +138,6 @@
             fileError.style.display = 'none';
         }
 
-        // Redirect to WhatsApp only if ALL inputs are strictly valid
         if (isValid) {
             let message = `Hello Smart Deals PK,%0A%0AI have sent Rs. 500 payment.%0A%0A*Method:* ${method}%0A*My Phone:* ${phone}%0A*TrxID:* ${trxid}%0A%0A_I am attaching my payment screenshot below:_`;
             let whatsappUrl = `https://wa.me/923711965637?text=${message}`;
@@ -152,5 +148,5 @@
 </script>
 
 </body>
-        </html>
+    </html>
         
